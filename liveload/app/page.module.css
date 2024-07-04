@@ -17,3 +17,17 @@
   width: 7.5rem;
   object-fit: contain;
 }
+.link {
+  color: #3466d1;
+}
+.heading {
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+@media (max-width: 840px) {
+  .display {
+    background-size: contain;
+    background-position: bottom;
+    background-blend-mode: color-burn;
+  }
+}
