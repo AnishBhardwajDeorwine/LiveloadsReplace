@@ -1,0 +1,19 @@
+.display {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url("../public/assests/background.webp");
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-size: 100% 130%;
+}
+.logo {
+  position: absolute;
+  top: 2%;
+  left: 3%;
+  height: 7.5rem;
+  width: 7.5rem;
+  object-fit: contain;
+}
