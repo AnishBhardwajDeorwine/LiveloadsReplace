@@ -14,12 +14,14 @@ export default function Home() {
       <Stack spacing={2} padding={3} borderRadius="3%" bgcolor="white">
         <Grid
           gap={3}
-          wrap="no-wrap"
           container
           direction="row"
           justifyContent="space-between"
           alignItems="center"
           max-width="full"
+          sx={{
+            flexWrap: "nowrap",
+          }}
         >
           <div className={style.heading}>Login to Liveloads</div>
           <Link href="/signup" className={style.link}>
