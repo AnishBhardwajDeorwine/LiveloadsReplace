@@ -21,7 +21,7 @@ const loginForm = () => {
   const [password, setPassword] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
   const [passwordTouched, setPasswordTouched] = useState(false);
-  const [toggle, setToggle] = useState(false);
+  const [toggle, setToggle] = useState(true);
 
   const handlePasswordToggle = () => {
     setToggle(!toggle);
@@ -67,7 +67,7 @@ const loginForm = () => {
                       onClick={handlePasswordToggle}
                       edge="end"
                     >
-                      {toggle ? <VisibilityOff /> : <Visibility />}
+                      {toggle ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
                   </InputAdornment>
                 ),
