@@ -12,28 +12,52 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
+import * as Yup from "yup"; // Import Yup
+import validationSchema from "./validationSchema"; // Import the Yup schema you created
+
 import "./page.module.css";
 const loginForm = () => {
   const [error, setError] = useState("");
-
-  const [emailTouched, setEmailTouched] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
-  const [passwordTouched, setPasswordTouched] = useState(false);
   const [toggle, setToggle] = useState(true);
 
   const handlePasswordToggle = () => {
     setToggle(!toggle);
   };
   const emailChange = (e) => {
-    setEmailTouched(true);
     setEmail(e.target.value);
+    setError("");
   };
 
   const passwordChange = (e) => {
-    let pass = e.target.value;
-    setPassword(pass);
+    setPassword(e.target.value);
+    setErrorPassword("");
+  };
+  const submitHandler = async () => {
+    // e.preventDefault();
+    try {
+      await validationSchema.validate(
+        { email, password },
+        { abortEarly: false }
+      );
+
+      // Validation passed, proceed with form submission logic here
+      console.log("Form data:", { email, password });
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        error.inner.forEach((err) => {
+          if (err.path === "email") {
+            setError(err.message);
+          }
+          if (err.path === "password") {
+            setErrorPassword(err.message);
+          }
+        });
+      }
+    }
+    console.log("Submit handler");
   };
 
   return (
@@ -90,7 +114,9 @@ const loginForm = () => {
               </Link>
             </Stack>
             <br />
-            <Button variant="contained">Login</Button>
+            <Button variant="contained" onClick={submitHandler}>
+              Login
+            </Button>
           </Stack>
         </Grid>
       </Grid>
