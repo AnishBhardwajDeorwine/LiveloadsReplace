@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Visibility from "@mui/icons-material/Visibility";
+import { yupResolver } from "@hookform/resolvers/yup";
 import "./style.css";
 import { useForm } from "react-hook-form";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -17,13 +18,18 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import * as Yup from "yup";
 import validationSchema from "./validationSchema";
 import toast from "react-hot-toast";
 
 const LoginForm = () => {
   const router = useRouter();
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
 
   const login = async (formData) => {
     const response = await axios.post(
@@ -33,8 +39,6 @@ const LoginForm = () => {
     const data = response.data;
     return data;
   };
-  const [error, setError] = useState("");
-  const [errorPassword, setErrorPassword] = useState("");
   const [toggle, setToggle] = useState(false);
   const handlePasswordToggle = () => {
     setToggle(!toggle);
@@ -51,25 +55,11 @@ const LoginForm = () => {
   });
 
   const onSubmit = async (formData) => {
-    try {
-      await validationSchema.validate(formData, { abortEarly: false });
-      const requestData = {
-        username: formData.email,
-        password: formData.password,
-      };
-      loginMutation.mutate(requestData);
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        error.inner.forEach((err) => {
-          if (err.path === "email") {
-            setError(err.message);
-          }
-          if (err.path === "password") {
-            setErrorPassword(err.message);
-          }
-        });
-      }
-    }
+    const requestData = {
+      username: formData.email,
+      password: formData.password,
+    };
+    loginMutation.mutate(requestData);
   };
   return (
     <div>
@@ -87,8 +77,7 @@ const LoginForm = () => {
                   "& .MuiFormHelperText-root": { color: "red" },
                 }}
                 id="email"
-                helperText={error}
-                onChange={() => setError("")}
+                helperText={errors?.email?.message}
               />
               <InputLabel sx={{ fontSize: 13, color: "black" }}>
                 Password
@@ -96,7 +85,6 @@ const LoginForm = () => {
               <TextField
                 type={toggle ? "text" : "password"}
                 {...register("password")}
-                onChange={() => setErrorPassword("")}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -115,7 +103,7 @@ const LoginForm = () => {
                   outline: "none",
                   "& .MuiFormHelperText-root": { color: "red" },
                 }}
-                helperText={errorPassword}
+                helperText={errors?.password?.message}
               />
               <Stack alignItems={"flex-end"} marginTop={2} marginBottom={4}>
                 <Link
