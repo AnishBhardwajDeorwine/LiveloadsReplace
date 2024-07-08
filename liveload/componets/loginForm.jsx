@@ -14,26 +14,22 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
+import axios from "axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import * as Yup from "yup";
 import validationSchema from "./validationSchema";
 import toast from "react-hot-toast";
 
-const loginForm = () => {
+const LoginForm = () => {
   const router = useRouter();
   const login = async (formData) => {
     console.log("Fetching the data");
-    const response = await fetch(
+
+    const response = await axios.post(
       "https://liveload-api.vercel.app/api/v1/login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      }
+      formData
     );
-    const data = await response.json();
+    const data = response.data;
     console.log("Data", data);
     return data;
   };
@@ -165,4 +161,4 @@ const loginForm = () => {
   );
 };
 
-export default loginForm;
+export default LoginForm;

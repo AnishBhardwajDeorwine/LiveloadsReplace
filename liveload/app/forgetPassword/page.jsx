@@ -6,7 +6,7 @@ import style from "./page.module.css";
 const signup = () => {
   return (
     <div className={style.display}>
-      <h2>Forget password Page Coming soon</h2>
+      <h2>Forgot password Page Coming soon</h2>
       <Link href="/">
         <Button variant="contained">Login Page</Button>
       </Link>
