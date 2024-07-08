@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import "./style.css";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {
   Button,
   Grid,
