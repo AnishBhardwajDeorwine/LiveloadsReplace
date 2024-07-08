@@ -1,7 +1,10 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import "./style.css";
+//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
 import {
   Button,
   Grid,
@@ -12,16 +15,34 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import * as Yup from "yup"; // Import Yup
-import validationSchema from "./validationSchema"; // Import the Yup schema you created
+import { useMutation, useQuery } from "@tanstack/react-query";
+import * as Yup from "yup";
+import validationSchema from "./validationSchema";
+import toast from "react-hot-toast";
 
-import "./page.module.css";
 const loginForm = () => {
+  const router = useRouter();
+  const login = async (formData) => {
+    console.log("Fetching the data");
+    const response = await fetch(
+      "https://liveload-api.vercel.app/api/v1/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }
+    );
+    const data = await response.json();
+    console.log("Data", data);
+    return data;
+  };
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
-  const [toggle, setToggle] = useState(true);
+  const [toggle, setToggle] = useState(false);
 
   const handlePasswordToggle = () => {
     setToggle(!toggle);
@@ -35,16 +56,33 @@ const loginForm = () => {
     setPassword(e.target.value);
     setErrorPassword("");
   };
+  const loginMutation = useMutation({
+    mutationFn: login,
+    onSuccess: (data) => {
+      if (data.errors) {
+        toast.error("Error while logging");
+      } else if (data.message) {
+        if (!data.status) {
+          toast.error(data.message);
+        } else {
+          toast.success(data.message);
+          router.push("/success");
+        }
+      }
+    },
+    onError: (error) => {
+      console.error("Login error:", error);
+      toast.error("Error occurred during login");
+    },
+  });
+
   const submitHandler = async () => {
-    // e.preventDefault();
     try {
       await validationSchema.validate(
         { email, password },
         { abortEarly: false }
       );
-
-      // Validation passed, proceed with form submission logic here
-      console.log("Form data:", { email, password });
+      loginMutation.mutate({ username: email, password });
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         error.inner.forEach((err) => {
@@ -59,7 +97,6 @@ const loginForm = () => {
     }
     console.log("Submit handler");
   };
-
   return (
     <div>
       <Grid container>
@@ -81,7 +118,7 @@ const loginForm = () => {
               Password
             </InputLabel>
             <TextField
-              type={toggle ? "password" : "text"}
+              type={toggle ? "text" : "password"}
               onChange={passwordChange}
               InputProps={{
                 endAdornment: (
@@ -120,6 +157,11 @@ const loginForm = () => {
           </Stack>
         </Grid>
       </Grid>
+      {loginMutation?.isPending && (
+        <div className="overlay">
+          <div className="loading"></div>
+        </div>
+      )}
     </div>
   );
 };
