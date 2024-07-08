@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Visibility from "@mui/icons-material/Visibility";
 import "./style.css";
+import { useForm } from "react-hook-form";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {
   Button,
@@ -22,62 +23,41 @@ import toast from "react-hot-toast";
 
 const LoginForm = () => {
   const router = useRouter();
-  const login = async (formData) => {
-    console.log("Fetching the data");
+  const { register, handleSubmit } = useForm();
 
+  const login = async (formData) => {
     const response = await axios.post(
       "https://liveload-api.vercel.app/api/v1/login",
       formData
     );
     const data = response.data;
-    console.log("Data", data);
     return data;
   };
   const [error, setError] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
   const [toggle, setToggle] = useState(false);
-
   const handlePasswordToggle = () => {
     setToggle(!toggle);
-  };
-  const emailChange = (e) => {
-    setEmail(e.target.value);
-    setError("");
-  };
-
-  const passwordChange = (e) => {
-    setPassword(e.target.value);
-    setErrorPassword("");
   };
   const loginMutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      if (data.errors) {
-        toast.error("Error while logging");
-      } else if (data.message) {
-        if (!data.status) {
-          toast.error(data.message);
-        } else {
-          toast.success(data.message);
-          router.push("/success");
-        }
-      }
+      toast.success(data.message);
+      router.push("/success");
     },
     onError: (error) => {
-      console.error("Login error:", error);
-      toast.error("Error occurred during login");
+      toast.error(error?.response?.data?.message);
     },
   });
 
-  const submitHandler = async () => {
+  const onSubmit = async (formData) => {
     try {
-      await validationSchema.validate(
-        { email, password },
-        { abortEarly: false }
-      );
-      loginMutation.mutate({ username: email, password });
+      await validationSchema.validate(formData, { abortEarly: false });
+      const requestData = {
+        username: formData.email,
+        password: formData.password,
+      };
+      loginMutation.mutate(requestData);
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         error.inner.forEach((err) => {
@@ -90,68 +70,71 @@ const LoginForm = () => {
         });
       }
     }
-    console.log("Submit handler");
   };
   return (
     <div>
-      <Grid container>
-        <Grid item xs spacing={5}>
-          <Stack spacing={1}>
-            <InputLabel sx={{ fontSize: 13, color: "black" }}>
-              Email Address
-            </InputLabel>
-            <TextField
-              onChange={emailChange}
-              sx={{
-                marginBottom: 2,
-                "& .MuiFormHelperText-root": { color: "red" },
-              }}
-              id="email"
-              helperText={error}
-            />
-            <InputLabel sx={{ fontSize: 13, color: "black" }}>
-              Password
-            </InputLabel>
-            <TextField
-              type={toggle ? "text" : "password"}
-              onChange={passwordChange}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handlePasswordToggle}
-                      edge="end"
-                    >
-                      {toggle ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                marginBottom: 2,
-                outline: "none",
-                "& .MuiFormHelperText-root": { color: "red" },
-              }}
-              helperText={errorPassword}
-            />
-            <Stack alignItems={"flex-end"} marginTop={2} marginBottom={4}>
-              <Link
-                href="/forgetPassword"
-                underline="none"
-                color={"black"}
-                sx={{ "&:hover": { color: "#1890ff" } }}
-              >
-                Forget Password?
-              </Link>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Grid container>
+          <Grid item xs spacing={5}>
+            <Stack spacing={1}>
+              <InputLabel sx={{ fontSize: 13, color: "black" }}>
+                Email Address
+              </InputLabel>
+              <TextField
+                {...register("email")}
+                sx={{
+                  marginBottom: 2,
+                  "& .MuiFormHelperText-root": { color: "red" },
+                }}
+                id="email"
+                helperText={error}
+                onChange={() => setError("")}
+              />
+              <InputLabel sx={{ fontSize: 13, color: "black" }}>
+                Password
+              </InputLabel>
+              <TextField
+                type={toggle ? "text" : "password"}
+                {...register("password")}
+                onChange={() => setErrorPassword("")}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handlePasswordToggle}
+                        edge="end"
+                      >
+                        {toggle ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  marginBottom: 2,
+                  outline: "none",
+                  "& .MuiFormHelperText-root": { color: "red" },
+                }}
+                helperText={errorPassword}
+              />
+              <Stack alignItems={"flex-end"} marginTop={2} marginBottom={4}>
+                <Link
+                  href="/forgetPassword"
+                  underline="none"
+                  color={"black"}
+                  sx={{ "&:hover": { color: "#1890ff" } }}
+                >
+                  Forget Password?
+                </Link>
+              </Stack>
+              <br />
+              <Button type="submit" variant="contained">
+                Login
+              </Button>
             </Stack>
-            <br />
-            <Button variant="contained" onClick={submitHandler}>
-              Login
-            </Button>
-          </Stack>
+          </Grid>
         </Grid>
-      </Grid>
+      </form>
       {loginMutation?.isPending && (
         <div className="overlay">
           <div className="loading"></div>
