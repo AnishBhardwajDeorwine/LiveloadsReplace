@@ -124,7 +124,7 @@ const LoginForm = () => {
                   color={"black"}
                   sx={{ "&:hover": { color: "#1890ff" } }}
                 >
-                  Forget Password?
+                  Forgot Password?
                 </Link>
               </Stack>
               <br />
