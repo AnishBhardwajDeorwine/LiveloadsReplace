@@ -3,8 +3,7 @@ import Button from "@mui/material/Button";
 import Link from "next/link";
 import style from "./page.module.css";
 
-const success = () => {
-  export const metadata = {
+export const metadata = {
   title: "Best Chat App - Secure & Fast",
   description: "Join our chat app for real-time conversations with security and speed.",
   openGraph: {
@@ -30,6 +29,8 @@ const success = () => {
   },
 };
 
+const success = () => {
+  
   return (
     <div className={style.display}>
       <h2>Success Page Coming soon</h2>
