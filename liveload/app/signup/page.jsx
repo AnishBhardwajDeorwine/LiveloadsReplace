@@ -3,8 +3,7 @@ import Button from "@mui/material/Button";
 import Link from "next/link";
 import style from "./page.module.css";
 
-const signup = () => {
-  export const metadata = {
+export const metadata = {
   title: "Best Chat App - Secure & Fast",
   description: "Join our chat app for real-time conversations with security and speed.",
   openGraph: {
@@ -29,6 +28,8 @@ const signup = () => {
     images: ["https://example.com/twitter-image.jpg"],
   },
 };
+const signup = () => {
+  
   return (
     <div className={style.display}>
       <h2>Sign Up Page Coming soon</h2>
